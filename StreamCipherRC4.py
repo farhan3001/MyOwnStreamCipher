@@ -1,11 +1,11 @@
 import os
 import sys
 import hashlib
-import tkinter as tk
+import tkinter as tkinter
 from tkinter import filedialog
 from Cryptodome.Cipher import ARC4
 
-# RC4 Encryption and Decryption for Text
+# Simple explanation of RC4 encryption and decryption process
 class StreamCipherRC4:
     #  KSA    
     def keyStateArray(self,key):
@@ -66,7 +66,7 @@ class StreamCipherRC4:
         
         return plaintext
 
-# RC4 Encrypion and Decryption for File
+#RC4 Encrypion and Decryption
 class EncryptionDecryptionTool:
     def __init__(self, userFile, userKey):
         # get the path to input file
@@ -189,11 +189,11 @@ class MainWindow:
         self.cipher = None
         self.cipherText = ""
         self.plainText= ""
-        self.cipherPlainText = tk.StringVar()
-        self.fileUrl = tk.StringVar()
-        self.text = tk.StringVar()
-        self.secretKey = tk.StringVar()
-        self.status = tk.StringVar()
+        self.cipherPlainText = tkinter.StringVar()
+        self.fileUrl = tkinter.StringVar()
+        self.text = tkinter.StringVar()
+        self.secretKey = tkinter.StringVar()
+        self.status = tkinter.StringVar()
         self.status.set("---")
 
         self.shouldCancel = False
@@ -201,12 +201,12 @@ class MainWindow:
         root.title("RC4 Stream Cipher Encryption Python")
         root.configure(bg="#FFFDD0")
 
-        self.fileEntryLabel = tk.Label(
+        self.fileEntryLabel = tkinter.Label(
             root,
             text="Enter File Path Or Click SELECT FILE Button",
             bg="#FFFDD0",
             fg="#000000",
-            anchor=tk.W
+            anchor=tkinter.W
         )
         self.fileEntryLabel.grid(
             padx=12,
@@ -216,15 +216,15 @@ class MainWindow:
             row=0,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.fileEntry = tk.Entry(
+        self.fileEntry = tkinter.Entry(
             root,
             textvariable=self.fileUrl,
             bg="#fff",
             exportselection=0,
-            relief=tk.FLAT
+            relief=tkinter.FLAT
         )
         self.fileEntry.grid(
             padx=15,
@@ -234,10 +234,10 @@ class MainWindow:
             row=1,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.selectBtn = tk.Button(
+        self.selectBtn = tkinter.Button(
             root,
             text="SELECT FILE",
             command=self.selectFileCallback,
@@ -245,7 +245,7 @@ class MainWindow:
             bg="#1089ff",
             fg="#000000",
             bd=2,
-            relief=tk.FLAT
+            relief=tkinter.FLAT
         )
         self.selectBtn.grid(
             padx=15,
@@ -255,15 +255,15 @@ class MainWindow:
             row=2,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.textEntryLabel = tk.Label(
+        self.textEntryLabel = tkinter.Label(
             root,
             text="Enter Text",
             bg="#FFFDD0",
             fg="#000000",
-            anchor=tk.W
+            anchor=tkinter.W
         )
         self.textEntryLabel.grid(
             padx=12,
@@ -273,15 +273,15 @@ class MainWindow:
             row=3,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.textEntry = tk.Entry(
+        self.textEntry = tkinter.Entry(
             root,
             textvariable=self.text,
             bg="#fff",
             exportselection=0,
-            relief=tk.FLAT
+            relief=tkinter.FLAT
         )
         self.textEntry.grid(
             padx=15,
@@ -291,15 +291,15 @@ class MainWindow:
             row=4,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.plainCipherResultLabel = tk.Label(
+        self.plainCipherResultLabel = tkinter.Label(
             root,
             text="Palin/Cipher Text Result:",
             bg="#FFFDD0",
             fg="#000000",
-            anchor=tk.W
+            anchor=tkinter.W
         )
         self.plainCipherResultLabel.grid(
             padx=12,
@@ -309,16 +309,16 @@ class MainWindow:
             row=5,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.plainCipherResult = tk.Entry(
+        self.plainCipherResult = tkinter.Entry(
             root,
             bg="#fff",
             textvariable=self.cipherPlainText,
             exportselection=0,
             state='disabled',
-            relief=tk.FLAT,
+            relief=tkinter.FLAT,
         )
         self.plainCipherResult.grid(
             padx=15,
@@ -328,15 +328,15 @@ class MainWindow:
             row=6,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.keyEntryLabel = tk.Label(
+        self.keyEntryLabel = tkinter.Label(
             root,
             text="Enter Key for Encryption and Decryption",
             bg="#FFFDD0",
             fg="#000000",
-            anchor=tk.W
+            anchor=tkinter.W
         )
         self.keyEntryLabel.grid(
             padx=12,
@@ -346,15 +346,15 @@ class MainWindow:
             row=7,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.keyEntry = tk.Entry(
+        self.keyEntry = tkinter.Entry(
             root,
             textvariable=self.secretKey,
             bg="#fff",
             exportselection=0,
-            relief=tk.FLAT
+            relief=tkinter.FLAT
         )
         self.keyEntry.grid(
             padx=15,
@@ -364,17 +364,17 @@ class MainWindow:
             row=8,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.encryptBtn = tk.Button(
+        self.encryptBtn = tkinter.Button(
             root,
             text="ENCRYPT",
             command=self.encryptCallback,
             bg="#ed3833",
             fg="#000000",
             bd=2,
-            relief=tk.FLAT
+            relief=tkinter.FLAT
         )
         self.encryptBtn.grid(
             padx=(15, 6),
@@ -384,17 +384,17 @@ class MainWindow:
             row=9,
             column=0,
             columnspan=2,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
         
-        self.decryptBtn = tk.Button(
+        self.decryptBtn = tkinter.Button(
             root,
             text="DECRYPT",
             command=self.decryptCallback,
             bg="#00bd56",
             fg="#000000",
             bd=2,
-            relief=tk.FLAT
+            relief=tkinter.FLAT
         )
         self.decryptBtn.grid(
             padx=(6, 15),
@@ -404,17 +404,17 @@ class MainWindow:
             row=9,
             column=2,
             columnspan=2,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.resetBtn = tk.Button(
+        self.resetBtn = tkinter.Button(
             root,
             text="RESET",
             command=self.resetCallback,
             bg="#aaaaaa",
             fg="#000000",
             bd=2,
-            relief=tk.FLAT
+            relief=tkinter.FLAT
         )
         self.resetBtn.grid(
             padx=15,
@@ -424,17 +424,17 @@ class MainWindow:
             row=10,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
-        self.statusBtn = tk.Label(
+        self.statusBtn = tkinter.Label(
             root,
             textvariable=self.status,
             bg="#FFFDD0",
             fg="#000000",
-            anchor=tk.W,
-            justify=tk.LEFT,
-            relief=tk.FLAT,
+            anchor=tkinter.W,
+            justify=tkinter.LEFT,
+            relief=tkinter.FLAT,
             wraplength=350
         )
         self.statusBtn.grid(
@@ -445,7 +445,7 @@ class MainWindow:
             row=11,
             column=0,
             columnspan=4,
-            sticky=tk.W+tk.E+tk.N+tk.S
+            sticky=tkinter.W+tkinter.E+tkinter.N+tkinter.S
         )
 
     def selectFileCallback(self):
@@ -575,6 +575,6 @@ class MainWindow:
 
 
 if __name__ == "__main__":
-    ROOT = tk.Tk()
+    ROOT = tkinter.Tk()
     MAIN_WINDOW = MainWindow(ROOT)
     ROOT.mainloop()
