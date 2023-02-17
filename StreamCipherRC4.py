@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import filedialog
 from Cryptodome.Cipher import ARC4
 
-# RC4 encryption and decryption process for Plain Text
+# Simple explanation of RC4 encryption and decryption process
 class StreamCipherRC4:
     #  KSA    
     def keyStateArray(self,key):
@@ -66,7 +66,7 @@ class StreamCipherRC4:
         
         return plaintext
 
-#RC4 Encrypion and Decryption for Files
+#RC4 Encrypion and Decryption
 class EncryptionDecryptionTool:
     def __init__(self, userFile, userKey):
         # get the path to input file
@@ -490,81 +490,81 @@ class MainWindow:
     def encryptCallback(self):
         self.freezeControls()
 
-        # try:
+        try:
 
-        if not self.fileEntry.get():
-            self.fileEntry.configure(state="disabled")
-            streamCipherRC4 = StreamCipherRC4()
-            self.cipherText = streamCipherRC4.encryption(self.textEntry.get(),self.keyEntry.get()) 
-            self.status.set("Text Encrypted!")
-            self.cipherPlainText.set(self.cipherText)
-            if self.shouldCancel:
-                self.cipher.abort()
-                self.status.set("Cancelled!")
-            self.cipher = None
-            self.shouldCancel = False
-
-        else: 
-            self.textEntry.configure(state="disabled")   
-            self.plainCipherResult.configure(state="disabled")   
-            self.cipher = EncryptionDecryptionTool(
-                self.fileUrl.get(),
-                self.secretKey.get(),
-            )
-            for percentage in self.cipher.encryption():
+            if not self.fileEntry.get() and self.textEntry.get():
+                self.fileUrl.set("")
+                streamCipherRC4 = StreamCipherRC4()
+                self.cipherText = streamCipherRC4.encryption(self.textEntry.get(),self.keyEntry.get()) 
+                self.status.set("Text Encrypted!")
+                self.cipherPlainText.set(self.cipherText)
                 if self.shouldCancel:
-                    break
-                percentage = "{0:.2f}%".format(percentage)
-                self.status.set(percentage)
-                self.statusBtn.update()
-            self.status.set("File Encrypted!")
-            if self.shouldCancel:
-                self.cipher.abort()
-                self.status.set("Cancelled!")
-            self.cipher = None
-            self.shouldCancel = False
-        # except Exception as e:
-        #     self.status.set(e)
+                    self.cipher.abort()
+                    self.status.set("Cancelled!")
+                self.cipher = None
+                self.shouldCancel = False
+
+            else: 
+                self.cipherPlainText.set("")
+                self.text.set("")   
+                self.cipher = EncryptionDecryptionTool(
+                    self.fileUrl.get(),
+                    self.secretKey.get(),
+                )
+                for percentage in self.cipher.encryption():
+                    if self.shouldCancel:
+                        break
+                    percentage = "{0:.2f}%".format(percentage)
+                    self.status.set(percentage)
+                    self.statusBtn.update()
+                self.status.set("File Encrypted!")
+                if self.shouldCancel:
+                    self.cipher.abort()
+                    self.status.set("Cancelled!")
+                self.cipher = None
+                self.shouldCancel = False
+        except Exception as e:
+            self.status.set(e)
 
         self.unfreezeControls()
 
     def decryptCallback(self):
         self.freezeControls()
 
-        # try:
-        if not self.fileEntry.get():
-            self.fileEntry.configure(state="disabled")
-            streamCipherRC4 = StreamCipherRC4()
-            self.plainText = streamCipherRC4.decryption(self.cipherText,self.keyEntry.get()) 
-            self.status.set("Text Decrypted!")
-            self.cipherPlainText.set(self.plainText)
-            if self.shouldCancel:
-                self.cipher.abort()
-                self.status.set("Cancelled!")
-            self.cipher = None
-            self.shouldCancel = False
-
-        else:         
-            self.textEntry.configure(state="disabled")   
-            self.plainCipherResult.configure(state="disabled") 
-            self.cipher = EncryptionDecryptionTool(
-                self.fileUrl.get(),
-                self.secretKey.get(),
-            )
-            for percentage in self.cipher.decryption():
+        try:
+            if not self.fileEntry.get() and self.textEntry.get():
+                self.fileUrl.set("")
+                streamCipherRC4 = StreamCipherRC4()
+                self.plainText = streamCipherRC4.decryption(self.cipherText,self.keyEntry.get()) 
+                self.status.set("Text Decrypted!")
+                self.cipherPlainText.set(self.plainText)
                 if self.shouldCancel:
-                    break
-                percentage = "{0:.2f}%".format(percentage)
-                self.status.set(percentage)
-                self.statusBtn.update()
-            self.status.set("File Decrypted!")
-            if self.shouldCancel:
-                self.cipher.abort()
-                self.status.set("Cancelled!")
-            self.cipher = None
-            self.shouldCancel = False
-        # except Exception as e:
-        #     self.status.set(e)
+                    self.cipher.abort()
+                    self.status.set("Cancelled!")
+                self.cipher = None
+                self.shouldCancel = False
+
+            else:         
+                self.cipherPlainText.set("")
+                self.text.set("")
+                self.cipher = EncryptionDecryptionTool(
+                    self.fileUrl.get(),
+                    self.secretKey.get(),
+                )
+                for percentage in self.cipher.decryption():
+                    if self.shouldCancel:
+                        break
+                    percentage = "{0:.2f}%".format(percentage)
+                    self.status.set(percentage)
+                    self.statusBtn.update()
+                self.status.set("File Decrypted!")
+                if self.shouldCancel:
+                    self.cipher.abort()
+                    self.status.set("Cancelled!")
+                self.cipher = None
+                self.shouldCancel = False
+        except Exception as e:
+            self.status.set(e)
         
         self.unfreezeControls()
 
