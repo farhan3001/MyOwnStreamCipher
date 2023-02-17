@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import filedialog
 from Cryptodome.Cipher import ARC4
 
-# Simple explanation of RC4 encryption and decryption process
+# RC4 Encryption and Decryption for Text
 class StreamCipherRC4:
     #  KSA    
     def keyStateArray(self,key):
@@ -66,7 +66,7 @@ class StreamCipherRC4:
         
         return plaintext
 
-#RC4 Encrypion and Decryption
+# RC4 Encrypion and Decryption for File
 class EncryptionDecryptionTool:
     def __init__(self, userFile, userKey):
         # get the path to input file
