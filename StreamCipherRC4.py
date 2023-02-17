@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import filedialog
 from Cryptodome.Cipher import ARC4
 
-# Simple explanation of RC4 encryption and decryption process
+# RC4 encryption and decryption process for Plain Text
 class StreamCipherRC4:
     #  KSA    
     def keyStateArray(self,key):
@@ -41,11 +41,11 @@ class StreamCipherRC4:
         key = [ord(char) for char in key]
         
         S = self.keyStateArray(key)
-        key_stream = self.pseudoRandomGenerationAutomation(S)
+        keyStream = self.pseudoRandomGenerationAutomation(S)
         
         ciphertext = ''
         for char in text:
-            enc = str(hex(char ^ next(key_stream))).upper()
+            enc = str(hex(char ^ next(keyStream))).upper()
             ciphertext += (enc)
             
         return ciphertext
@@ -57,124 +57,127 @@ class StreamCipherRC4:
         key = [ord(char) for char in key]
         
         S = self.keyStateArray(key)
-        key_stream = self.pseudoRandomGenerationAutomation(S)
+        keyStream = self.pseudoRandomGenerationAutomation(S)
         
         plaintext = ''
         for char in ciphertext:
-            dec = str(chr(char ^ next(key_stream)))
+            dec = str(chr(char ^ next(keyStream)))
             plaintext += dec
         
         return plaintext
 
-class EncryptionTool:
-    def __init__(self, user_file, user_key):
+#RC4 Encrypion and Decryption for Files
+class EncryptionDecryptionTool:
+    def __init__(self, userFile, userKey):
         # get the path to input file
-        self.user_file = user_file
+        self.userFile = userFile
 
-        self.input_file_size = os.path.getsize(self.user_file)
-        self.chunk_size = 1024
-        self.total_chunks = (self.input_file_size // self.chunk_size) + 1
+        self.inputFileSize = os.path.getsize(self.userFile)
+        self.chunkSize = 1024
+        self.totalChunks = (self.inputFileSize // self.chunkSize) + 1
         
         # convert the key to bytes
-        self.user_key = bytes(user_key, "utf-8")
+        self.userKey = bytes(userKey, "utf-8")
 
         # get the file extension
-        self.file_extension = self.user_file.split(".")[-1]
+        self.fileExtension = self.userFile.split(".")[-1]
         
         # hash type for hashing key
-        self.hash_type = "SHA256"
+        self.hashType = "SHA256"
 
         # encrypted file name
-        self.encrypt_output_file = ".".join(self.user_file.split(".")[:-1]) \
-            + "." + self.file_extension + ".rc4"
+        self.encryptOutputFile = ".".join(self.userFile.split(".")[:-1]) \
+            + "." + self.fileExtension + ".rc4"
 
         # decrypted file name
-        self.decrypt_output_file = self.user_file.split(".")
-        self.decrypt_output_file = ".".join(self.decrypt_output_file[:-2]) \
-            + "." + self.decrypt_output_file[1]
+        self.decryptOutputFile = self.userFile.split(".")
+        self.decryptOutputFile = ".".join(self.decryptOutputFile[:-2]) \
+            + "." + self.decryptOutputFile[1]
 
         # dictionary to store hashed key
-        self.hashed_key = dict()
+        self.hashedKey = dict()
 
         # hash key and into 32 bit hashes
         self.hashKey()
 
-    def readInChunks(self, file_object, chunk_size=1024):
+    def readInChunks(self, fileObject, chunkSize=1024):
         while True:
-            data = file_object.read(chunk_size)
+            data = fileObject.read(chunkSize)
             if not data:
                 break
             yield data
 
     def encryption(self):
         # create a cipher object
-        cipher_object = ARC4.new(
-            self.hashed_key["key"]
+        cipherObject = ARC4.new(
+            self.hashedKey["key"]
         )
 
-        input_file = open(self.user_file, "rb")
-        output_file = open(self.encrypt_output_file, "ab")
-        done_chunks = 0
+        inputFile = open(self.userFile, "rb")
+        outputFile = open(self.encryptOutputFile, "ab")
+        chunksDone = 0
 
-        for piece in self.readInChunks(input_file, self.chunk_size):
-            encrypted_content = cipher_object.encrypt(piece)
-            output_file.write(encrypted_content)
-            done_chunks += 1
-            yield (done_chunks / self.total_chunks) * 100
+        for piece in self.readInChunks(inputFile, self.chunkSize):
+            encryptedContent = cipherObject.encrypt(piece)
+            outputFile.write(encryptedContent)
+            chunksDone += 1
+            yield (chunksDone / self.totalChunks) * 100
         
-        input_file.close()
-        output_file.close()
+        inputFile.close()
+        outputFile.close()
 
         # clean up the cipher object
-        del cipher_object
+        del cipherObject
 
     def decryption(self):
         # create a cipher object
-        cipher_object = ARC4.new(
-            self.hashed_key["key"]
+        cipherObject = ARC4.new(
+            self.hashedKey["key"]
         )
 
         # delete file if file already exist
         self.abort()
 
-        input_file = open(self.user_file, "rb")
-        output_file = open(self.decrypt_output_file, "xb")
-        done_chunks = 0
+        inputFile = open(self.userFile, "rb")
+        outputFile = open(self.decryptOutputFile, "xb")
+        chunksDone = 0
 
-        for piece in self.readInChunks(input_file):
-            decrypted_content = cipher_object.decrypt(piece)
-            output_file.write(decrypted_content)
-            done_chunks += 1
-            yield (done_chunks / self.total_chunks) * 100
+        for piece in self.readInChunks(inputFile):
+            decryptedContent = cipherObject.decrypt(piece)
+            outputFile.write(decryptedContent)
+            chunksDone += 1
+            yield (chunksDone / self.totalChunks) * 100
         
-        input_file.close()
-        output_file.close()
+        inputFile.close()
+        outputFile.close()
 
         # clean up the cipher object
-        del cipher_object
+        del cipherObject
 
     def abort(self):
-        if os.path.isfile(self.encrypt_output_file):
-            os.remove(self.encrypt_output_file)
-        if os.path.isfile(self.decrypt_output_file):
-            os.remove(self.decrypt_output_file)
+        if os.path.isfile(self.encryptOutputFile):
+            os.remove(self.encryptOutputFile)
+        if os.path.isfile(self.decryptOutputFile):
+            os.remove(self.decryptOutputFile)
 
 
     def hashKey(self):
         # convert key to hash
         # create a new hash object
-        hasher = hashlib.new(self.hash_type)
-        hasher.update(self.user_key)
+        hasher = hashlib.new(self.hashType)
+        hasher.update(self.userKey)
 
         # turn the output key hash into 32 bytes (256 bits)
-        self.hashed_key["key"] = bytes(hasher.hexdigest()[:32], "utf-8")
+        self.hashedKey["key"] = bytes(hasher.hexdigest()[:32], "utf-8")
 
         # clean up hash object
         del hasher
 
+# GUI
 class MainWindow:
 
     # configure root directory path relative to this file
+    
     THIS_FOLDER_G = ""
     if getattr(sys, "frozen", False):
         THIS_FOLDER_G = os.path.dirname(sys.executable)
@@ -183,25 +186,29 @@ class MainWindow:
 
     def __init__(self, root):
         self.root = root
-        self._cipher = None
-        self._file_url = tk.StringVar()
-        self._secret_key = tk.StringVar()
-        self._status = tk.StringVar()
-        self._status.set("---")
+        self.cipher = None
+        self.cipherText = ""
+        self.plainText= ""
+        self.cipherPlainText = tk.StringVar()
+        self.fileUrl = tk.StringVar()
+        self.text = tk.StringVar()
+        self.secretKey = tk.StringVar()
+        self.status = tk.StringVar()
+        self.status.set("---")
 
-        self.should_cancel = False
+        self.shouldCancel = False
 
         root.title("RC4 Stream Cipher Encryption Python")
         root.configure(bg="#FFFDD0")
 
-        self.file_entry_label = tk.Label(
+        self.fileEntryLabel = tk.Label(
             root,
             text="Enter File Path Or Click SELECT FILE Button",
             bg="#FFFDD0",
             fg="#000000",
             anchor=tk.W
         )
-        self.file_entry_label.grid(
+        self.fileEntryLabel.grid(
             padx=12,
             pady=(8, 0),
             ipadx=0,
@@ -212,14 +219,14 @@ class MainWindow:
             sticky=tk.W+tk.E+tk.N+tk.S
         )
 
-        self.file_entry = tk.Entry(
+        self.fileEntry = tk.Entry(
             root,
-            textvariable=self._file_url,
+            textvariable=self.fileUrl,
             bg="#fff",
             exportselection=0,
             relief=tk.FLAT
         )
-        self.file_entry.grid(
+        self.fileEntry.grid(
             padx=15,
             pady=6,
             ipadx=8,
@@ -230,7 +237,7 @@ class MainWindow:
             sticky=tk.W+tk.E+tk.N+tk.S
         )
 
-        self.select_btn = tk.Button(
+        self.selectBtn = tk.Button(
             root,
             text="SELECT FILE",
             command=self.selectFileCallback,
@@ -240,7 +247,7 @@ class MainWindow:
             bd=2,
             relief=tk.FLAT
         )
-        self.select_btn.grid(
+        self.selectBtn.grid(
             padx=15,
             pady=8,
             ipadx=24,
@@ -251,14 +258,14 @@ class MainWindow:
             sticky=tk.W+tk.E+tk.N+tk.S
         )
 
-        self.key_entry_label = tk.Label(
+        self.textEntryLabel = tk.Label(
             root,
-            text="Enter Key for Encryption and Decryption",
+            text="Enter Text",
             bg="#FFFDD0",
             fg="#000000",
             anchor=tk.W
         )
-        self.key_entry_label.grid(
+        self.textEntryLabel.grid(
             padx=12,
             pady=(8, 0),
             ipadx=0,
@@ -269,14 +276,14 @@ class MainWindow:
             sticky=tk.W+tk.E+tk.N+tk.S
         )
 
-        self.key_entry = tk.Entry(
+        self.textEntry = tk.Entry(
             root,
-            textvariable=self._secret_key,
+            textvariable=self.text,
             bg="#fff",
             exportselection=0,
             relief=tk.FLAT
         )
-        self.key_entry.grid(
+        self.textEntry.grid(
             padx=15,
             pady=6,
             ipadx=8,
@@ -287,7 +294,80 @@ class MainWindow:
             sticky=tk.W+tk.E+tk.N+tk.S
         )
 
-        self.encrypt_btn = tk.Button(
+        self.plainCipherResultLabel = tk.Label(
+            root,
+            text="Palin/Cipher Text Result:",
+            bg="#FFFDD0",
+            fg="#000000",
+            anchor=tk.W
+        )
+        self.plainCipherResultLabel.grid(
+            padx=12,
+            pady=(8, 0),
+            ipadx=0,
+            ipady=1,
+            row=5,
+            column=0,
+            columnspan=4,
+            sticky=tk.W+tk.E+tk.N+tk.S
+        )
+
+        self.plainCipherResult = tk.Entry(
+            root,
+            bg="#fff",
+            textvariable=self.cipherPlainText,
+            exportselection=0,
+            state='disabled',
+            relief=tk.FLAT,
+        )
+        self.plainCipherResult.grid(
+            padx=15,
+            pady=6,
+            ipadx=8,
+            ipady=8,
+            row=6,
+            column=0,
+            columnspan=4,
+            sticky=tk.W+tk.E+tk.N+tk.S
+        )
+
+        self.keyEntryLabel = tk.Label(
+            root,
+            text="Enter Key for Encryption and Decryption",
+            bg="#FFFDD0",
+            fg="#000000",
+            anchor=tk.W
+        )
+        self.keyEntryLabel.grid(
+            padx=12,
+            pady=(8, 0),
+            ipadx=0,
+            ipady=1,
+            row=7,
+            column=0,
+            columnspan=4,
+            sticky=tk.W+tk.E+tk.N+tk.S
+        )
+
+        self.keyEntry = tk.Entry(
+            root,
+            textvariable=self.secretKey,
+            bg="#fff",
+            exportselection=0,
+            relief=tk.FLAT
+        )
+        self.keyEntry.grid(
+            padx=15,
+            pady=6,
+            ipadx=8,
+            ipady=8,
+            row=8,
+            column=0,
+            columnspan=4,
+            sticky=tk.W+tk.E+tk.N+tk.S
+        )
+
+        self.encryptBtn = tk.Button(
             root,
             text="ENCRYPT",
             command=self.encryptCallback,
@@ -296,18 +376,18 @@ class MainWindow:
             bd=2,
             relief=tk.FLAT
         )
-        self.encrypt_btn.grid(
+        self.encryptBtn.grid(
             padx=(15, 6),
             pady=8,
             ipadx=24,
             ipady=6,
-            row=7,
+            row=9,
             column=0,
             columnspan=2,
             sticky=tk.W+tk.E+tk.N+tk.S
         )
         
-        self.decrypt_btn = tk.Button(
+        self.decryptBtn = tk.Button(
             root,
             text="DECRYPT",
             command=self.decryptCallback,
@@ -316,18 +396,18 @@ class MainWindow:
             bd=2,
             relief=tk.FLAT
         )
-        self.decrypt_btn.grid(
+        self.decryptBtn.grid(
             padx=(6, 15),
             pady=8,
             ipadx=24,
             ipady=6,
-            row=7,
+            row=9,
             column=2,
             columnspan=2,
             sticky=tk.W+tk.E+tk.N+tk.S
         )
 
-        self.reset_btn = tk.Button(
+        self.resetBtn = tk.Button(
             root,
             text="RESET",
             command=self.resetCallback,
@@ -336,20 +416,20 @@ class MainWindow:
             bd=2,
             relief=tk.FLAT
         )
-        self.reset_btn.grid(
+        self.resetBtn.grid(
             padx=15,
             pady=(4, 12),
             ipadx=24,
             ipady=6,
-            row=8,
+            row=10,
             column=0,
             columnspan=4,
             sticky=tk.W+tk.E+tk.N+tk.S
         )
 
-        self.status_label = tk.Label(
+        self.statusBtn = tk.Label(
             root,
-            textvariable=self._status,
+            textvariable=self.status,
             bg="#FFFDD0",
             fg="#000000",
             anchor=tk.W,
@@ -357,12 +437,12 @@ class MainWindow:
             relief=tk.FLAT,
             wraplength=350
         )
-        self.status_label.grid(
+        self.statusBtn.grid(
             padx=12,
             pady=(0, 12),
             ipadx=0,
             ipady=1,
-            row=9,
+            row=11,
             column=0,
             columnspan=4,
             sticky=tk.W+tk.E+tk.N+tk.S
@@ -372,94 +452,132 @@ class MainWindow:
         tk.Grid.columnconfigure(root, 1, weight=1)
         tk.Grid.columnconfigure(root, 2, weight=1)
         tk.Grid.columnconfigure(root, 3, weight=1)
+        tk.Grid.columnconfigure(root, 4, weight=1)
 
     def selectFileCallback(self):
         try:
             name = filedialog.askopenfile()
-            self._file_url.set(name.name)
+            self.fileUrl.set(name.name)
     
         except Exception as e:
-            self._status.set(e)
-            self.status_label.update()
+            self.status.set(e)
+            self.statusBtn.update()
     
     def freezeControls(self):
-        self.file_entry.configure(state="disabled")
-        self.key_entry.configure(state="disabled")
-        self.select_btn.configure(state="disabled")
-        self.encrypt_btn.configure(state="disabled")
-        self.decrypt_btn.configure(state="disabled")
-        self.reset_btn.configure(text="CANCEL", command=self.cancelCallback,
+        self.fileEntry.configure(state="disabled")
+        self.textEntry.configure(state="disabled")
+        self.plainCipherResult.configure(state="disabled")
+        self.keyEntry.configure(state="disabled")
+        self.selectBtn.configure(state="disabled")
+        self.encryptBtn.configure(state="disabled")
+        self.decryptBtn.configure(state="disabled")
+        self.resetBtn.configure(text="CANCEL", command=self.cancelCallback,
             fg="#ed3833", bg="#fafafa")
-        self.status_label.update()
+        self.statusBtn.update()
     
     def unfreezeControls(self):
-        self.file_entry.configure(state="normal")
-        self.key_entry.configure(state="normal")
-        self.select_btn.configure(state="normal")
-        self.encrypt_btn.configure(state="normal")
-        self.decrypt_btn.configure(state="normal")
-        self.reset_btn.configure(text="RESET", command=self.resetCallback,
+        self.fileEntry.configure(state="normal")
+        self.textEntry.configure(state="normal")
+        self.plainCipherResult.configure(state="normal")
+        self.keyEntry.configure(state="normal")
+        self.selectBtn.configure(state="normal")
+        self.encryptBtn.configure(state="normal")
+        self.decryptBtn.configure(state="normal")
+        self.resetBtn.configure(text="RESET", command=self.resetCallback,
             fg="#ffffff", bg="#aaaaaa")
-        self.status_label.update()
+        self.statusBtn.update()
 
     def encryptCallback(self):
         self.freezeControls()
 
-        try:
-            self._cipher = EncryptionTool(
-                self._file_url.get(),
-                self._secret_key.get(),
+        # try:
+
+        if not self.fileEntry.get():
+            self.fileEntry.configure(state="disabled")
+            streamCipherRC4 = StreamCipherRC4()
+            self.cipherText = streamCipherRC4.encryption(self.textEntry.get(),self.keyEntry.get()) 
+            self.status.set("Text Encrypted!")
+            self.cipherPlainText.set(self.cipherText)
+            if self.shouldCancel:
+                self.cipher.abort()
+                self.status.set("Cancelled!")
+            self.cipher = None
+            self.shouldCancel = False
+
+        else: 
+            self.textEntry.configure(state="disabled")   
+            self.plainCipherResult.configure(state="disabled")   
+            self.cipher = EncryptionDecryptionTool(
+                self.fileUrl.get(),
+                self.secretKey.get(),
             )
-            for percentage in self._cipher.encryption():
-                if self.should_cancel:
+            for percentage in self.cipher.encryption():
+                if self.shouldCancel:
                     break
                 percentage = "{0:.2f}%".format(percentage)
-                self._status.set(percentage)
-                self.status_label.update()
-            self._status.set("File Encrypted!")
-            if self.should_cancel:
-                self._cipher.abort()
-                self._status.set("Cancelled!")
-            self._cipher = None
-            self.should_cancel = False
-        except Exception as e:
-            self._status.set(e)
+                self.status.set(percentage)
+                self.statusBtn.update()
+            self.status.set("File Encrypted!")
+            if self.shouldCancel:
+                self.cipher.abort()
+                self.status.set("Cancelled!")
+            self.cipher = None
+            self.shouldCancel = False
+        # except Exception as e:
+        #     self.status.set(e)
 
         self.unfreezeControls()
 
     def decryptCallback(self):
         self.freezeControls()
 
-        try:
-            self._cipher = EncryptionTool(
-                self._file_url.get(),
-                self._secret_key.get(),
+        # try:
+        if not self.fileEntry.get():
+            self.fileEntry.configure(state="disabled")
+            streamCipherRC4 = StreamCipherRC4()
+            self.plainText = streamCipherRC4.decryption(self.cipherText,self.keyEntry.get()) 
+            self.status.set("Text Decrypted!")
+            self.cipherPlainText.set(self.plainText)
+            if self.shouldCancel:
+                self.cipher.abort()
+                self.status.set("Cancelled!")
+            self.cipher = None
+            self.shouldCancel = False
+
+        else:         
+            self.textEntry.configure(state="disabled")   
+            self.plainCipherResult.configure(state="disabled") 
+            self.cipher = EncryptionDecryptionTool(
+                self.fileUrl.get(),
+                self.secretKey.get(),
             )
-            for percentage in self._cipher.decryption():
-                if self.should_cancel:
+            for percentage in self.cipher.decryption():
+                if self.shouldCancel:
                     break
                 percentage = "{0:.2f}%".format(percentage)
-                self._status.set(percentage)
-                self.status_label.update()
-            self._status.set("File Decrypted!")
-            if self.should_cancel:
-                self._cipher.abort()
-                self._status.set("Cancelled!")
-            self._cipher = None
-            self.should_cancel = False
-        except Exception as e:
-            self._status.set(e)
+                self.status.set(percentage)
+                self.statusBtn.update()
+            self.status.set("File Decrypted!")
+            if self.shouldCancel:
+                self.cipher.abort()
+                self.status.set("Cancelled!")
+            self.cipher = None
+            self.shouldCancel = False
+        # except Exception as e:
+        #     self.status.set(e)
         
         self.unfreezeControls()
 
     def resetCallback(self):
-        self._cipher = None
-        self._file_url.set("")
-        self._secret_key.set("")
-        self._status.set("---")
+        self.cipher = None
+        self.fileUrl.set("")
+        self.cipherPlainText.set("")
+        self.text.set("")
+        self.secretKey.set("")
+        self.status.set("---")
     
     def cancelCallback(self):
-        self.should_cancel = True
+        self.shouldCancel = True
 
 
 if __name__ == "__main__":
