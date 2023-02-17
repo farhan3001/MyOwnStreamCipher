@@ -448,12 +448,6 @@ class MainWindow:
             sticky=tk.W+tk.E+tk.N+tk.S
         )
 
-        tk.Grid.columnconfigure(root, 0, weight=1)
-        tk.Grid.columnconfigure(root, 1, weight=1)
-        tk.Grid.columnconfigure(root, 2, weight=1)
-        tk.Grid.columnconfigure(root, 3, weight=1)
-        tk.Grid.columnconfigure(root, 4, weight=1)
-
     def selectFileCallback(self):
         try:
             name = filedialog.askopenfile()
