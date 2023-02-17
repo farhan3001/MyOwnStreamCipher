@@ -529,7 +529,7 @@ class MainWindow:
             if not self.fileEntry.get() and self.textEntry.get():
                 self.fileUrl.set("")
                 streamCipherRC4 = StreamCipherRC4()
-                self.plainText = streamCipherRC4.decryption(self.cipherText,self.keyEntry.get()) 
+                self.plainText = streamCipherRC4.decryption(self.textEntry.get(),self.keyEntry.get()) 
                 self.status.set("Text Decrypted!")
                 self.cipherPlainText.set(self.plainText)
                 if self.shouldCancel:
